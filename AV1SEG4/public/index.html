@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#signup">Registrar</a></li>
+            <li><a href="#signin">Login</a></li>
+            <li><a href="#verify-2fa" id="verify-2fa-link" style="display: none;">Verificar 2FA</a></li>
+            <li><a href="#protected" id="protected-link" style="display: none;">Área Protegida</a></li>
+            <li><a href="#" id="logout-link" style="display: none;">Sair</a></li>
+        </ul>
+    </nav>
+
+    <section id="signup">
+        <h2>Registrar</h2>
+        <form id="signup-form" onsubmit="return false;">
+            <label for="username">Usuário:</label><input type="text" id="username" name="username" required><br>
+            <label for="password">Senha:</label><input type="password" id="password" name="password" required><br>
+            <label for="nome">Nome:</label><input type="text" id="nome" name="nome" required><br>
+            <label for="email">Email:</label><input type="email" id="email" name="email" required><br>
+            <button type="submit">Registrar</button>
+        </form>
+        <p id="signup-message"></p>
+    </section>
+
+    <section id="signin" style="display: none;">
+        <h2>Login</h2>
+        <form id="signin-form" onsubmit="return false;">
+            <label for="login-username">Usuário:</label><input type="text" id="login-username" name="username" required><br>
+            <label for="login-password">Senha:</label><input type="password" id="login-password" name="password" required><br>
+            <label for="captcha" id="captcha-label" style="display: none;">CAPTCHA:</label><input type="text" id="captcha" name="captcha" style="display: none;"><br>
+            <button type="submit">Login</button>
+        </form>
+        <p id="signin-message"></p>
+    </section>
+
+    <section id="verify-2fa" style="display: none;">
+        <h2>Verificar 2FA</h2>
+        <form id="verify-2fa-form" onsubmit="return false;">
+            <label for="user-id">User ID:</label><input type="text" id="user-id" name="userId" readonly><br>
+            <label for="two-factor-code">Código 2FA:</label><input type="text" id="two-factor-code" name="code" required><br>
+            <button type="submit">Verificar</button>
+        </form>
+        <p id="verify-2fa-message"></p>
+    </section>
+
+    <section id="protected" style="display: none;">
+        <div class="protected-container">
+            <h2>🌟 Bem-vindo à Área Protegida! 🌟</h2>
+            <img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXg0cWh4M2thY3J6dXNqcG0wZWpxcGxlbXJjd3VyYWprZXptYTk2MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/GeimqsH0TLDt4tScGw/giphy.gif" alt="GIF de Boas-Vindas" class="welcome-gif">
+            <p id="protected-message">Você está logado com sucesso! Aproveite esta área exclusiva.</p>
+            <div class="info-box">
+                <h3>Informações do Usuário</h3>
+                <p><strong>Nome:</strong> <span id="user-name">[Nome do Usuário]</span></p>
+                <p><strong>Email:</strong> <span id="user-email">[Email do Usuário]</span></p>
+            </div>
+        </div>
+    </section>
+    <!-- https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXg0cWh4M2thY3J6dXNqcG0wZWpxcGxlbXJjd3VyYWprZXptYTk2MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/GeimqsH0TLDt4tScGw/giphy.gif 
+    https://media.giphy.com/media/3o6Zt6MLkU6bY9q7mE/giphy.gif-->
+    <script src="script.js"></script>
+</body>
+</html>

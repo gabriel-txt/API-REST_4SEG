@@ -1,0 +1,135 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    gap: 15px;
+    background-color: #333;
+    padding: 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+section {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+section.active {
+    display: block;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 300px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+#signup-message, #signin-message, #verify-2fa-message {
+    margin-top: 10px;
+    color: #dc3545;
+    display: none;
+    font-weight: bold;
+}
+
+/* Estilização da seção protegida */
+#protected {
+    background-color: #f9f3ff; /* Fundo suave roxo claro */
+    border: 2px solid #d4bfff; /* Borda roxa suave */
+    border-radius: 15px;
+    text-align: center;
+    padding: 30px;
+}
+
+.protected-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.protected-container h2 {
+    color: #6b48ff; /* Roxo vibrante */
+    font-family: 'Comic Sans MS', 'Chalkboard', 'Arial', sans-serif; /* Fonte divertida */
+    margin-bottom: 20px;
+}
+
+.welcome-gif {
+    width: 200px;
+    height: auto;
+    border-radius: 10px;
+    margin: 20px 0;
+    animation: bounce 1.5s infinite; /* Animação de "pulo" */
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.info-box {
+    background-color: #ffffff;
+    border: 1px solid #e1d7ff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.info-box h3 {
+    color: #6b48ff;
+    margin-bottom: 10px;
+}
+
+.info-box p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.info-box span {
+    color: #ff6f91; /* Rosa para destacar os valores */
+    font-weight: bold;
+}

@@ -1,13 +1,14 @@
 {
-  "name": "authentication-api-starter-code",
+  "name": "authentication-api",
   "version": "1.0.0",
-  "description": "Starter code of the tutorial for building a password Authentication API.",
+  "description": "Code for building a password Authentication API.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js localhost 8080"
   },
   "dependencies": {
+    "authentication-api": "file:",
     "authentication-api-starter-code": "file:",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",

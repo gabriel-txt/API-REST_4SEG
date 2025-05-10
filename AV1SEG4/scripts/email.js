@@ -1,10 +1,6 @@
 const { createTransport } = require('nodemailer');
 require('dotenv').config();
 
-// Verificar se as variáveis do .env foram carregadas corretamente
-console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-
 const transporter = createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: 587, // Porta para STARTTLS (use 465 para SSL)

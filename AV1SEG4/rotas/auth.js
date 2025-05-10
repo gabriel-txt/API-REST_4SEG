@@ -38,6 +38,7 @@ const signupValidation = [
     check('perfil').trim().escape().optional(),
 ];
 
+// Rota de Registro de usuário
 router.post('/signup', signupValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -53,6 +54,7 @@ router.post('/signup', signupValidation, async (req, res) => {
         const { username, password, nome, email } = req.body;
         const perfil = req.body.perfil || "admin";
 
+        // Verifica se o usuário já existe no db
         dbOperations.findUserByUsername(username, async (err, user) => {
             if (err) {
                 logAction('Signup Failed - Database Error', { error: err.message });
@@ -72,6 +74,7 @@ router.post('/signup', signupValidation, async (req, res) => {
 
             const { salt, hash } = generateHash(password);
 
+            // Cria o usuário
             dbOperations.createUser(username, hash, salt, nome, email, perfil, (err, newUser) => {
                 if (err) {
                     logAction('Signup Failed - Creation Error', { error: err.message });
@@ -107,6 +110,7 @@ const signinValidation = [
     check('captcha').trim().escape().optional(),
 ];
 
+// Rota de login de usuário
 router.post('/signin', signinValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -121,6 +125,7 @@ router.post('/signin', signinValidation, async (req, res) => {
 
         const { username, password, captcha } = req.body;
 
+        // Verifica se o usuário existe
         dbOperations.findUserByUsername(username, async (err, user) => {
             if (err || !user) {
                 logAction('Signin Failed - User Not Found', { username });
@@ -130,7 +135,7 @@ router.post('/signin', signinValidation, async (req, res) => {
                 });
             }
 
-            // Verificar se há um CAPTCHA pendente
+            // Verifica se há um CAPTCHA pendente
             if (user.captcha) {
                 if (!captcha) {
                     logAction('Signin Failed - CAPTCHA Required', { username, userEmail: user.email });
@@ -141,6 +146,7 @@ router.post('/signin', signinValidation, async (req, res) => {
                     });
                 }
 
+                // Se o CAPTCHA existe verifica se ele está correto
                 if (captcha !== user.captcha) {
                     logAction('Signin Failed - Invalid CAPTCHA', { username, userEmail: user.email, captcha });
                     return res.status(400).json({
@@ -159,6 +165,7 @@ router.post('/signin', signinValidation, async (req, res) => {
                 });
             }
 
+            // Se a senha estiver errada, gera o CAPTCHA
             const isMatch = verifyPassword(password, user.salt, user.password);
             if (!isMatch) {
                 // Gerar CAPTCHA de 6 dígitos
@@ -187,7 +194,7 @@ router.post('/signin', signinValidation, async (req, res) => {
                         }
 
                         logAction('Signin Failed - CAPTCHA Sent', { username, userEmail: user.email, captchaCode });
-                        return res.status(401).json({
+                        return res.status(401).json({ // Não informar senha inválida
                             message: 'Password is incorrect! A CAPTCHA has been sent to your email. 🔐',
                             type: 'error',
                             requiresCaptcha: true,
@@ -249,6 +256,7 @@ const twoFactorValidation = [
     check('code').trim().escape().notEmpty().withMessage('Two-factor code is required'),
 ];
 
+// Rota de verificação de 2FA
 router.post('/verify-2fa', twoFactorValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -261,6 +269,7 @@ router.post('/verify-2fa', twoFactorValidation, async (req, res) => {
             });
         }
 
+        
         const { userId, code } = req.body;
 
         dbOperations.findUserById(userId, (err, user) => {
@@ -325,6 +334,7 @@ router.post('/verify-2fa', twoFactorValidation, async (req, res) => {
     }
 });
 
+// Rota de Saída do usuário
 router.post('/logout', (_req, res) => {
     res.clearCookie('refreshtoken');
     logAction('Logout Successful', {});
@@ -334,6 +344,7 @@ router.post('/logout', (_req, res) => {
     });
 });
 
+// Rota de token
 router.post('/refresh_token', async (req, res) => {
     try {
         const { refreshtoken } = req.cookies;
@@ -445,6 +456,7 @@ const passwordResetValidation = [
     check('email').isEmail()
 ];
 
+// Rota de reset de senha por email
 router.post('/send-password-reset-email', passwordResetValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -510,6 +522,7 @@ const resetPasswordValidation = [
         .trim().escape()
 ];
 
+// Rota de reset de senha
 router.post('/reset-password/:id/:token', resetPasswordValidation, async (req, res) => {
     try {
         const errors = validationResult(req);

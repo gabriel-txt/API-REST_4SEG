@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.get('/auth/protected', (req, res) => {
-    // Simulação de autenticação (substitua pela lógica real)
     if (req.session && req.session.user) {
         res.json({
             message: 'Bem-vindo!',

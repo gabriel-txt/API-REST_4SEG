@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const logFilePath = path.resolve(__dirname, '../logs.txt');
+const logFilePath = path.resolve(__dirname, '../../logs.txt');
 
 const logAction = (action, details) => {
     const timestamp = new Date().toISOString();

@@ -1,5 +1,5 @@
 const { verify } = require('jsonwebtoken')
-const db = require('../db/database')
+const db = require('../../../config/database')
 
 const protected = async (req, res, next) => {
 	const authorization = req.headers['authorization']

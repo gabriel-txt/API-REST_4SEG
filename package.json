@@ -2,10 +2,10 @@
   "name": "authentication-api",
   "version": "1.0.0",
   "description": "Code for building a password Authentication API.",
-  "main": "app.js",
+  "main": "./src/server.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js localhost 8080"
+    "start": "node ./src/server.js",
+    "dev": "nodemon ./src/server.js localhost 8080"
   },
   "dependencies": {
     "authentication-api": "file:",

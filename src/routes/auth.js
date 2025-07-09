@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const { verify } = require('jsonwebtoken');
-const { dbOperations, generateHash, verifyPassword } = require('../db/database');
-const { logAction } = require('../scripts/logger');
+const { dbOperations, generateHash, verifyPassword } = require('../config/database');
+const { logAction } = require('../infrastructure/logger/logger');
 
 const {
     createAccessToken,
@@ -11,7 +11,7 @@ const {
     sendAccessToken,
     sendRefreshToken,
     createPasswordResetToken,
-} = require('../scripts/tokens');
+} = require('../infrastructure/auth/tokens');
 const {
     transporter,
     createPasswordResetUrl,
@@ -19,8 +19,8 @@ const {
     passwordResetConfirmationTemplate,
     captchaTemplate,
     twoFactorTemplate,
-} = require('../scripts/email');
-const { protected } = require('../scripts/protected');
+} = require('../infrastructure/email/email');
+const { protected } = require('../interfaces/http/middlewares/protected');
 
 router.get('/', async (req, res) => {
     res.send('Hello Express!! 👋, this is Auth end point');
@@ -125,7 +125,7 @@ const signinValidation = [
         .notEmpty().withMessage('Password is required')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage('Password must contain only lowercase, uppercase letters, and numbers'),
     check('captcha')
-        .trim().escape().optional()
+        .trim().escape().optional({ checkFalsy: true })
         .isNumeric().withMessage('CAPTCHA must be numeric')
 ];
 
@@ -134,7 +134,7 @@ router.post('/signin', signinValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            logAction('Signin Failed - Invalid Input', { errors: errors.array() });
+            logAction('Signin Failed - Invalid Input', { errors: errors.array().map(error => ({ field: error.param, message: error.msg })) });
             return res.status(400).json({
                 message: 'Valor inválido',
                 type: 'error',
@@ -258,7 +258,7 @@ router.post('/signin', signinValidation, async (req, res) => {
             });
         });
     } catch (error) {
-        logAction('Signin Failed - Unexpected Error', { error: error.message });
+        logAction('Signin Failed - Unexpected Error', { errors: errors.array().map(error => ({ field: error.param, message: error.msg })) });
         console.log('Error: ', error);
         res.status(500).json({
             type: 'error',
@@ -284,7 +284,7 @@ router.post('/verify-2fa', twoFactorValidation, async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            logAction('2FA Verification Failed - Invalid Input', { errors: errors.array() });
+            logAction('2FA Verification Failed - Invalid Input', { errors: errors.array().map(error => ({ field: error.param, message: error.msg })) });
             return res.status(400).json({
                 message: 'Valor inválido',
                 type: 'error',
@@ -485,7 +485,7 @@ router.post('/send-password-reset-email', passwordResetValidation, async (req, r
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            logAction('Send Password Reset Email Failed - Invalid Input', { errors: errors.array() });
+            logAction('Send Password Reset Email Failed - Invalid Input', { errors: errors.array().map(error => ({ field: error.param, message: error.msg })) });
             return res.status(400).json({
                 message: 'Email inválido',
                 type: 'error',
@@ -551,7 +551,7 @@ router.post('/reset-password/:id/:token', resetPasswordValidation, async (req, r
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            logAction('Reset Password Failed - Invalid Input', { errors: errors.array() });
+            logAction('Reset Password Failed - Invalid Input', { errors: errors.array().map(error => ({ field: error.param, message: error.msg })) });
             return res.status(400).json({
                 message: 'Valor inválido',
                 type: 'error',

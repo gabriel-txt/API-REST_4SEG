@@ -67,11 +67,32 @@ button:hover {
 }
 
 #signup-message, #signin-message, #verify-2fa-message {
-    margin-top: 10px;
-    color: #dc3545;
+    margin-top: 20px;
+    margin: auto;
+    width: 50vw;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: #791c26c4;
+    background-color: #dc354667;
     display: none;
     font-weight: bold;
 }
+.warn-message {
+    color: #856404;
+    background-color: #fff3cd;
+}
+.sucess-message {
+    color: #155724;
+    background-color: #d4edda;
+}
+
+#signup-message.error, #signin-message.error, #verify-2fa-message.error {
+    color: #721c24;
+    background-color: #f8d7da;
+}
+
+
 
 /* Estilização da seção protegida */
 #protected {

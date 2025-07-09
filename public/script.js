@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutLink = document.getElementById('logout-link');
     let session = null;
     let userId = null;
+    let accesstoken = null;
 
     // Mostrar seção com base no hash da URL
     function showSection(sectionId) {
-        console.log('Mostrando seção:', sectionId);
         document.querySelectorAll('section').forEach(section => {
             section.classList.remove('active');
             section.style.display = 'none';
@@ -22,11 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (section) {
             section.classList.add('active');
             section.style.display = 'block';
-            console.log('Seção encontrada e exibida:', sectionId);
         } else {
             document.getElementById('signin').classList.add('active');
             document.getElementById('signin').style.display = 'block';
-            console.log('Seção não encontrada, fallback para signin');
+            // Volta para signin se a seção não existir
         }
     }
 
@@ -53,10 +52,23 @@ document.addEventListener('DOMContentLoaded', () => {
     showSection(location.hash.substring(1) || 'signin');
 
     // Função para exibir mensagem temporária
-    function displayMessage(element, message, duration = 15000) {
-        console.log('Exibindo mensagem:', message);
+    function displayMessage(element, message, type = 'warning' , duration = 15000) {
         element.textContent = message;
         element.style.display = 'block';
+        switch (type) {
+            case 'success':
+                element.classList.add('success');
+                element.classList.remove('error', 'warn');
+                break;
+            case 'error':
+                element.classList.add('error');
+                element.classList.remove('success', 'warn');
+                break;
+            default:
+                element.classList.add('warn');
+                element.classList.remove('success', 'error');
+                break;
+        }
         setTimeout(() => {
             element.textContent = '';
             element.style.display = 'none';
@@ -104,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(({ result }) => {
                 console.log('Enviando requisição para:', 'http://localhost:8080/auth/signup', 'com dados:', data);
-                displayMessage(signupMessage, result.message);
+                displayMessage(signupMessage, result.message, result.type);
                 if (result.type === 'success') {
                     setTimeout(() => {
                         console.log('Redirecionando para signin após registro');
@@ -112,12 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         showSection('signin');
                     }, 2000);
                 } else {
-                    displayMessage(signupMessage, result.message || 'Erro ao registrar! Detalhes: ' + JSON.stringify(result));
+                    displayMessage(signupMessage, result.message || 'Erro ao registrar! Detalhes: ' + JSON.stringify(result), result.type);
                 }
             })
             .catch(error => {
                 console.error('Erro ao registrar:', error.message);
-                displayMessage(signupMessage, 'Erro ao registrar! Detalhes: ' + error.message);
+                displayMessage(signupMessage, 'Erro ao registrar! Detalhes: ' + error.message, result.type);
             });
     });
 
@@ -137,12 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
             credentials: 'include'
         })
             .then(({ result, response }) => {
-                console.log('Enviando requisição para:', 'http://localhost:8080/auth/signin', 'com dados:', data);
-                displayMessage(signinMessage, result.message);
-                session = response.headers.get('Set-Cookie') || session;
-                console.log('Cookie de sessão após login:', session);
+                displayMessage(signinMessage, result.message, result.type);
+                //session = response.headers.get('Set-Cookie') || session;
                 if (result.requires2FA) {
-                    console.log('2FA necessário, userId:', result.userId);
                     userId = result.userId;
                     const userIdField = document.getElementById('user-id');
                     if (userIdField) {
@@ -154,9 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('captcha-label').style.display = 'none';
                     document.getElementById('captcha').style.display = 'none';
                     verify2FALink.style.display = 'block';
-                    console.log('Exibindo link de verificação 2FA');
                     setTimeout(() => {
-                        console.log('Redirecionando para verify-2fa');
                         location.hash = '#verify-2fa';
                         showSection('verify-2fa');
                     }, 2000);
@@ -175,22 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         fetchProtectedData();
                     }, 2000);
                 } else {
-                    console.log('Resposta inesperada:', result);
-                    displayMessage(signinMessage, 'Resposta inesperada do servidor: ' + JSON.stringify(result));
+                    displayMessage(signinMessage, JSON.stringify(result.message), result.type);
                 }
             })
             .catch(error => {
-                console.error('Erro ao fazer login:', error.message);
-                displayMessage(signinMessage, 'Erro ao fazer login! Detalhes: ' + error.message);
+                displayMessage(signinMessage, error.message, 'error');
             });
     });
 
     // Verificar 2FA
     verify2FAForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log('Formulário de verificação 2FA enviado - Previndo recarregamento');
         const data = {
-            userId: document.getElementById('user-id').value,
+            userId: userId,
             code: document.getElementById('two-factor-code').value
         };
         handleFetch('http://localhost:8080/auth/verify-2fa', {
@@ -201,12 +205,19 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(({ result, response }) => {
                 console.log('Enviando requisição para:', 'http://localhost:8080/auth/verify-2fa', 'com dados:', data);
-                displayMessage(verify2FAMessage, result.message);
-                session = response.headers.get('Set-Cookie') || session;
+                displayMessage(verify2FAMessage, result.message, result.type);
+                accesstoken = result.accesstoken || null;
+                if (accesstoken) {
+                    console.log('Access Token recebido:', accesstoken);
+                }
+                //session = response.headers.get('Set-Cookie') || session;
                 console.log('Cookie de sessão após 2FA:', session);
                 if (result.type === 'success') {
                     protectedLink.style.display = 'block';
                     logoutLink.style.display = 'block';
+                    verify2FALink.style.display = 'none';
+                    signinMessage.style.display = 'none';
+                    signupMessage.style.display = 'none';
                     setTimeout(() => {
                         console.log('Redirecionando para protected após 2FA');
                         location.hash = '#protected';
@@ -216,8 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
             .catch(error => {
-                console.error('Erro ao verificar 2FA:', error.message);
-                displayMessage(verify2FAMessage, 'Erro ao verificar 2FA! Detalhes: ' + error.message);
+                displayMessage(verify2FAMessage, error.message, 'error');
             });
     });
 
@@ -256,20 +266,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função para buscar e preencher dados da área protegida
     async function fetchProtectedData() {
         try {
-            console.log('Buscando dados protegidos com cookie:', session);
             const response = await fetch('http://localhost:8080/auth/protected', {
                 method: 'GET',
                 headers: {
-                    'Cookie': session || '',
+                    //'Cookie': session || '',
+                    'Authorization': accesstoken ? 'Bearer ' + accesstoken : '',
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include'
             });
             const result = await response.json();
+            if (result.type === 'error' && result.message.includes('token')) {
+            // Tentar renovar o token
+            await refreshAccessToken();
+            // Tentar novamente
+            return await fetchProtectedData();
+        }
             console.log('Dados da área protegida:', result);
             document.getElementById('protected-message').textContent = result.message || 'Bem-vindo! Você está logado.';
             if (result.user) {
-                document.getElementById('user-name').textContent = result.user.name || '[Nome Não Encontrado]';
+                console.log('Dados do usuário:', result.user);
+                document.getElementById('user-name').textContent = result.user.nome || '[Nome Não Encontrado]';
                 document.getElementById('user-email').textContent = result.user.email || '[Email Não Encontrado]';
             } else {
                 console.log('Nenhum dado de usuário retornado');
@@ -284,3 +301,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+async function refreshAccessToken() {
+    const response = await fetch('http://localhost:8080/auth/refresh_token', {
+        method: 'POST',
+        credentials: 'include'
+    });
+    const result = await response.json();
+    if (result.accesstoken) {
+        accesstoken = result.accesstoken;
+    }
+}
